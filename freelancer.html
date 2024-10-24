@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="freelancer.css">
+    <title>Freelancer Page</title>
+    <script>
+        async function takeProject(projectId) {
+            const response = await fetch('/take-project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ project_id: projectId })
+            });
+
+            if (response.redirected) {
+                window.location.href = response.url; 
+            }
+        }
+
+        async function fetchProjects() {
+            const response = await fetch('/get-projects');
+            const projects = await response.json();
+
+            let projectList = projects.map(project => `
+                <div class="project">
+                    <h3>${project.project_name}</h3>
+                    <p>${project.project_description}</p>
+                    <p>Amount: ${project.amount}</p>
+                    <p>Email: ${project.email}</p>
+                    <p>Phone: ${project.phone}</p>
+                    <button onclick="takeProject('${project._id}')">Take Project</button>
+                </div>
+            `).join('');
+
+            document.getElementById('projectContainer').innerHTML = projectList;
+        }
+
+        window.onload = fetchProjects;
+    </script>
+</head>
+<body>
+    <h1>Available Projects</h1>
+    <div id="projectContainer"></div> 
+</body>
+</html>
